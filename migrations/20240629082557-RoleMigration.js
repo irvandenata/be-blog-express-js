@@ -10,6 +10,9 @@ module.exports = {
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
 
+        //use column name snake case
+        
+        
         await queryInterface.createTable('roles',{
             id: {
                 type: Sequelize.INTEGER,

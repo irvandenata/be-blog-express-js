@@ -2,7 +2,7 @@ import { Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 
 // db interfaces
 export interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
-    id?: number;
+    id?: string;
     firstName: string;
     first_name?: string;
     lastName: string;
@@ -28,7 +28,6 @@ export interface UserModel extends Model<InferAttributes<UserModel>, InferCreati
 export interface RoleModel extends Model<InferAttributes<RoleModel>, InferCreationAttributes<RoleModel>> {
     id: number;
     name: "user" | "author" | "admin";
-    code: string;
 }
 export interface ReviewModel extends Model<InferAttributes<ReviewModel>, InferCreationAttributes<ReviewModel>> {
     id?: number;
@@ -55,7 +54,7 @@ export interface BlogModel extends Model<InferAttributes<BlogModel>, InferCreati
     blogStatus?: "active" | "passive";
     length?: number;
     clapCount?: number;
-    authorId?: number;
+    authorId?: string;
     categoryId?: number;
 }
 // other interfaces
@@ -80,9 +79,9 @@ export interface EmailRequest {
 }
 export interface JwtSignInputs {
     data: {
-        id: number | undefined;
+        id: string | undefined;
         email?: string;
-        role?: string;
+        role?: number;
     };
     secret: string;
     expiresIn: string;

@@ -12,10 +12,6 @@ const Role = db.define<RoleModel>('role',
         name: {
             type: DataTypes.ENUM('user', 'author', 'admin'),
             allowNull: false,
-        },
-        code: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
         }
     }
 );

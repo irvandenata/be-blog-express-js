@@ -5,6 +5,11 @@ import AppError from "../utils/appError";
 import { UserModel } from "../interfaces";
 
 const User = db.define<UserModel>('user', {
+    id: {
+        type: DataTypes.UUID,
+        autoIncrement: true,
+        primaryKey: true
+    },
     firstName: {
         type: DataTypes.STRING(50),
         allowNull: false,
@@ -81,11 +86,6 @@ const User = db.define<UserModel>('user', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
-    },
-    memberStatus: {
-        type: DataTypes.ENUM("active", "passive"),
-        allowNull: false,
-        defaultValue: "passive",
     },
     profileImage: {
         type: DataTypes.STRING(150),
