@@ -1,25 +1,25 @@
-import { PrismaClient } from "@prisma/client";
-import express, { Request, Response } from "express";
-import createError from "http-errors"
+'use strict';
 
-const prisma = new PrismaClient()
-const app = express()
+import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
+import ErrorHandler from "./middlewares/errorHandler"
 
-app.use(express.json())
+ErrorHandler.initializeUncaughtException() // initialize uncaught exception
 
+import app from "./app"
+import db from "./models"
+const PORT = process.env.PORT || 8000
 
-// TODO: Routing aplikasi akan kita tulis di sini
+db.authenticate()
+    .then(() => console.log(`Connected to ${db.config.database} successfully`))
+    .catch((err:any) => console.log(`Unable to connect ${db.config.database}:`, err.message))
 
+db.sync({ force: false })
+    .then(() => console.log(`Synced to ${db.config.database} successfully`))
+    .catch((err:any) => console.log(`Unable to sync ${db.config.database}:`, err))
 
-
-app.get("/", async (req: Request, res: Response) => {
-  res.json({ message: "Hello World" })
+const server = app.listen(PORT, () => {
+    console.log(`Server is awake on port ${PORT}:${process.env.NODE_ENV}`);
 })
-// handle 404 error
-app.use((req: Request, res: Response, next: Function) => {
-  res.status(404).json({ message: "Not Found" })
-})
 
-app.listen(3000, () =>
-  console.log(`⚡️[server]: Server is running at https://localhost:3000`)
-)
+ErrorHandler.initializeUnhandledRejection(server) // initialize unhandled rejection
