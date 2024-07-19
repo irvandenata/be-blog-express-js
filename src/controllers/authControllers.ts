@@ -39,7 +39,7 @@ export const checkAuth: RequestHandler = catchAsync(async (req, res, next) => {
     return res.status(200).send({ status: "success", data });
 });
 
-// export const logout: RequestHandler = (req, res, next) => {
-//     res.clearCookie(process.env.COOKIE_NAME);
-//     res.status(200).json({ status: 'success', data: '' });
-// };
+export const logout: RequestHandler = (req, res, next) => {
+    res.clearCookie(process.env.COOKIE_NAME as string);
+    res.status(200).json({ status: 'success', message: 'Logout successful'});
+};

@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 import slugify from "slugify"
 import AppError from "../utils/appError"
 import { File } from "../interfaces";
-
+    
 
 // configure disk storage option
 const storeOnDisk = (path?: string) => {
@@ -39,7 +39,7 @@ const fileFilter = (req: Request, file: File, cb: Function) => {
 }
 
 const uploadSingleFile = (name: string, strType: "memory" | "disk", path?: string) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: any, res: Response, next: NextFunction) => {
         const upload = multer({
             storage: strType && strType === "memory" ? memoryStorage : storeOnDisk(path),
             fileFilter: fileFilter

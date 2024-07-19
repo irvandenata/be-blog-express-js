@@ -1,37 +1,36 @@
 import { Server } from "http";
 import httpStatus from "http-status";
 import { Request, Response, NextFunction } from "express";
-import AppError from "../utils/appError";
+import  AppError from "../utils/appError";
+import CustomError from "../utils/customError";
 // import { Sequelize, ValidationError, Error, ValidationErrorItem } from "sequelize"
 
-
-
 export default class ErrorHandler {
-	static convert = () => {
-		return async (
-			err: any,
-			req: Request,
-			res: Response,
-			next: NextFunction
-		) => {
-			let error = err;
-			if (!(error instanceof AppError)) {
+	static convert =
+		() => (err:Error,req: Request, res: Response, next: NextFunction) => {
+            let error: CustomError;
+			if (!(err instanceof AppError)) {
+                error = err as CustomError;
+
 				// set initial statusCode to 400 if not already set
+               //convert error to BaseError
 				error.statusCode = error.statusCode || httpStatus.BAD_REQUEST;
 				// convert errors conditionally
 				if (error.name === "JsonWebTokenError") {
 					error.message = "Invalid session. Please log in again.";
 					error.statusCode = httpStatus.UNAUTHORIZED;
-				} else if (error === "TokenExpiredError") {
+				} else if (error.name === "TokenExpiredError") {
 					error.message = "Session expired. Please log in again.";
 					error.statusCode = httpStatus.UNAUTHORIZED;
-				} else if (error === "NotBeforeError") {
+				} else if (error.name === "NotBeforeError") {
 					error.message = "Session not active. Please log in again.";
 					error.statusCode = httpStatus.UNAUTHORIZED;
 				} else {
 					error.statusCode =
-						error.statusCode || httpStatus.INTERNAL_SERVER_ERROR
-					error.message = error.message || httpStatus[error.statusCode as keyof typeof httpStatus] as string;
+						error.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+					error.message =
+						error.message ||
+						(httpStatus[error.statusCode as keyof typeof httpStatus] as string);
 					error.isOperational = false;
 				}
 				// recreate the error object with the new arguments
@@ -42,22 +41,19 @@ export default class ErrorHandler {
 					error.name,
 					error.stack
 				);
-			}
+			}else{
+                error = err;
+            }
 			// pass the error to the actual error handler middleware
 			next(error);
 		};
-	};
 
-	static handle = () => {
-		return async (
-			err: AppError,
-			req: Request,
-			res: Response,
-			next: NextFunction
-		) => {
+	static handle =
+		() => (err: AppError , req: Request, res: Response, next: NextFunction) => {
 			err.statusCode = err.statusCode || 500;
-           
-			// if (err.statusCode === 401) res.clearCookie(process.env.COOKIE_NAME);
+
+			if (err.statusCode === 401)
+				res.clearCookie(process.env.COOKIE_NAME as string);
 			// // handling errors acoording to node_env
 			if (process.env.NODE_ENV === "production") {
 				this.sendErrorProd(err, req, res);
@@ -65,7 +61,6 @@ export default class ErrorHandler {
 				this.sendErrorDev(err, res);
 			}
 		};
-	};
 
 	static initializeUncaughtException = () => {
 		process.on("uncaughtException", (err: Error) => {

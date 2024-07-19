@@ -19,6 +19,7 @@ export interface UserModel extends Model<InferAttributes<UserModel>, InferCreati
     roleId?: number;
     createdAt?: string;
     updatedAt?: string;
+    oldImage?: string;
     role?: {
         id?: number;
         name?: string;
@@ -121,6 +122,13 @@ export interface BlogFilter {
     limit?: number;
     q?: string;
 }
+
+
+export interface UserFilter{
+    page?: number;
+    limit?: number;
+    q?: string;
+}
 export interface BlogData {
     id?: number
     title: string;
@@ -130,4 +138,13 @@ export interface BlogData {
     oldImage?: string;
     image?: string;
     categoryId: number
+}
+
+export interface UserInterface {
+    id: string,
+    firstName: string,
+    lastName: string,
+    role: string,
+    email: string
+    profileImage?: string
 }

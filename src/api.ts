@@ -6,9 +6,9 @@ import categoryRoutes from "./routes/categoryRoutes";
 import userRoutes from "./routes/userRoutes";
 const api = Router();
 
-api.use("/auth", authRoutes);
+api.use("/auth", authRoutes)
 // .use('/blogs', blogRoutes)
 // .use('/categories', categoryRoutes)
-// .use('/users', isLoggedIn, userRoutes)
+.use('/users', isLoggedIn, userRoutes);
 
 export default api;
