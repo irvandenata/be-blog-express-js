@@ -7,7 +7,7 @@ import ErrorHandler from "./middlewares/errorHandler"
 ErrorHandler.initializeUncaughtException() // initialize uncaught exception
 
 import app from "./app"
-import db from "./models"
+import db from "./models/connection"
 const PORT = process.env.PORT || 8000
 
 db.authenticate()

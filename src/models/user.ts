@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import { DataTypes } from 'sequelize';
-import db from ".";
 import AppError from "../utils/appError";
 import { UserModel } from "../interfaces";
+import db from "./connection";
 
 const User = db.define<UserModel>('user', {
     id: {

@@ -57,11 +57,14 @@ export default class ErrorHandler {
 			if (err.statusCode === 401)
 				res.clearCookie(process.env.COOKIE_NAME as string);
 			// // handling errors acoording to node_env
+
 			if (process.env.NODE_ENV === "production") {
 				this.sendErrorProd(err, req, res);
-			} else {
+			} else if (process.env.NODE_ENV === "development") {
 				this.sendErrorDev(err, res);
-			}
+			}else {
+                this.sendErrorProd(err, req, res);
+            }
 		};
 
 	static initializeUncaughtException = () => {

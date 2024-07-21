@@ -81,7 +81,6 @@ export default class AuthService {
         // validate email and password
         Validation.validate(UserValidation.LOGIN, data);
 		const { email, password, remember } = data;
-        
 		// check if email and password exist
 		if (!email || !password) {
 			throw new AppError(400, "Please provide email and password");
@@ -168,7 +167,6 @@ export default class AuthService {
 		const data = { id: user.id, role: user.role!.id };
 		const secret = process.env.JWT_SESSION_SECRET as string;
 		const expiresIn = process.env.JWT_SESSION_EXPIRY as string;
-		console.log(data, secret, expiresIn);
 		const sessionToken = await JWT.sign({ data, secret, expiresIn });
 		const sessionCookie = await new Cookie().encrypt(sessionToken);
 		// create a cookie expiry date in compatible w jwt lifetime
