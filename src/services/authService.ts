@@ -6,6 +6,8 @@ import JWT from "../utils/jwt";
 import { UserModel, LoginData } from "../interfaces";
 import { API_URL } from "../config";
 import { User, Role } from "../models";
+import { Validation } from "../validations/validation";
+import { UserValidation } from "../validations/userValidation";
 
 export default class AuthService {
 	constructor() {}
@@ -76,7 +78,10 @@ export default class AuthService {
 	};
 
 	public loginUserAndCreateSession = async (data: LoginData) => {
+        // validate email and password
+        Validation.validate(UserValidation.LOGIN, data);
 		const { email, password, remember } = data;
+        
 		// check if email and password exist
 		if (!email || !password) {
 			throw new AppError(400, "Please provide email and password");

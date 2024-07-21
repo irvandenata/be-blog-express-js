@@ -1,0 +1,16 @@
+=================================================
+Time of error: Fri, 19 Jul 2024 17:22:19 GMT
+Error: Cannot set property message of [object Object] which has only a getter 
+ Stack: TypeError: Cannot set property message of [object Object] which has only a getter
+    at /Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/src/middlewares/errorHandler.ts:33:19
+    at Layer.handle_error (/Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/layer.js:71:5)
+    at trim_prefix (/Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:326:13)
+    at /Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:280:10)
+    at /Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:646:15
+    at next (/Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:265:14)
+    at /Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:646:15
+    at next (/Users/denata/Developments/WEBSITE/EXPRESSjS/be-blog/node_modules/.pnpm/express@4.19.2/node_modules/express/lib/router/index.js:265:14)
+================================================= 
+ 

@@ -23,3 +23,5 @@ const server = app.listen(PORT, () => {
 })
 
 ErrorHandler.initializeUnhandledRejection(server) // initialize unhandled rejection
+
+export default server;

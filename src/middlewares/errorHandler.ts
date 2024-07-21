@@ -1,19 +1,21 @@
 import { Server } from "http";
 import httpStatus from "http-status";
 import { Request, Response, NextFunction } from "express";
-import  AppError from "../utils/appError";
+import AppError from "../utils/appError";
 import CustomError from "../utils/customError";
+import logging from "../utils/logging";
+import fs from "fs";
 // import { Sequelize, ValidationError, Error, ValidationErrorItem } from "sequelize"
 
 export default class ErrorHandler {
 	static convert =
-		() => (err:Error,req: Request, res: Response, next: NextFunction) => {
-            let error: CustomError;
+		() => (err: Error, req: Request, res: Response, next: NextFunction) => {
+			let error: CustomError;
 			if (!(err instanceof AppError)) {
-                error = err as CustomError;
+				error = err as CustomError;
 
 				// set initial statusCode to 400 if not already set
-               //convert error to BaseError
+				//convert error to BaseError
 				error.statusCode = error.statusCode || httpStatus.BAD_REQUEST;
 				// convert errors conditionally
 				if (error.name === "JsonWebTokenError") {
@@ -41,15 +43,15 @@ export default class ErrorHandler {
 					error.name,
 					error.stack
 				);
-			}else{
-                error = err;
-            }
+			} else {
+				error = err;
+			}
 			// pass the error to the actual error handler middleware
 			next(error);
 		};
 
 	static handle =
-		() => (err: AppError , req: Request, res: Response, next: NextFunction) => {
+		() => (err: AppError, req: Request, res: Response, next: NextFunction) => {
 			err.statusCode = err.statusCode || 500;
 
 			if (err.statusCode === 401)
@@ -110,6 +112,11 @@ export default class ErrorHandler {
 		console.log(err.stack);
 		console.log("----------------------------------");
 
+		if (err.statusCode === 500) {
+			this.loggingError(err);
+		}
+        logging.error(err.message, err.stack);
+
 		// 2) send error message to client
 		res.status(err.statusCode).send({
 			status: err.status,
@@ -152,6 +159,23 @@ export default class ErrorHandler {
 					message: "Something went wrong!",
 				});
 		}
+	};
+
+	private static loggingError = (err: AppError) => {
+		// log the error to a file
+		let message = `=================================================\nTime of error: ${new Date().toUTCString()}\nError: ${
+			err.message
+		} \n Stack: ${
+			err.stack
+		}\n================================================= \n \n`;
+
+		let locationFile = "./logs/error.log";
+        
+		fs.appendFile(locationFile, message, (err) => {
+			if (err) {
+				console.log(err);
+			}
+		});
 	};
 
 	// private static convertSequelizeError = (err: ValidationError) => {
