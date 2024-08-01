@@ -1,15 +1,19 @@
+import { error } from "console";
+
     export default class AppError extends Error {
     statusCode: number;
     isOperational: boolean;
     name: string;
     status: string;
+    errors?: any;
 
     constructor(
         statusCode: number,
         message: string,
         isOperational: boolean = true,
         name: string = "Error",
-        stack: string = ""
+        stack: string = "",
+        errors?: any
     ) {
         super(message);
         this.statusCode = statusCode;

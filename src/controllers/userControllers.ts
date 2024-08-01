@@ -1,28 +1,58 @@
 import { NextFunction, RequestHandler } from "express";
 import catchAsync from "../utils/catchAsync";
 import UserService from "../services/userService";
+import { UserModel } from "../interfaces";
 const userService = new UserService();
 
-export const getUsers: RequestHandler = catchAsync(async (req, res, next) => {
-	const data = await userService.getUsers(
-		req.query,
-		req.protocol,
-		req.get("host")!
-	);
-	return res.status(200).send({ status: "success", data });
-});
-
-export const createUser: RequestHandler = catchAsync(
-	async (req: any, res: any, next: NextFunction) => {
-            
+export const getUsers: RequestHandler = catchAsync(
+    async (req: any, res: any, next: NextFunction) => {
+        const data = await userService.getUsers(
+            req.query,
+            req.protocol,
+            req.get("host")!
+        );
+        return res.status(200).send({ status: "success", data });
     }
 );
 
-// export const updateProfile: RequestHandler = catchAsync(async (req, res, next) => {
-//     const data = await userService.updateProfile(req.params.userId!
-//         , req.protocol, req.get('host')!, req.body, req.file!)
-//     return res.status(200).send({ status: "success", data })
-// })
+export const createUser: RequestHandler = catchAsync(
+    async (req: any, res: any, next: NextFunction) => {
+        const data = await userService.createUser(
+            req.protocol,
+            req.get("host")!,
+            req.body,
+            req.file!
+        );
+        return res.status(201).send({ status: "success", data });
+    }
+);
+
+export const getUserById: RequestHandler = catchAsync(
+    async (req: any, res: any, next: NextFunction) => {
+        const data = await userService.getUserById(req.params.id);
+        return res.status(200).send({ status: "success", data });
+    }
+);
+
+export const updateProfile: RequestHandler = catchAsync(
+    async (req, res, next) => {
+        const data = await userService.updateUserById(
+            req.params.id!,
+            req.protocol,
+            req.get("host")!,
+            req.body,
+            req.file!
+        );
+        return res.status(200).send({ status: "success", data });
+    }
+);
+
+export const deleteUserById: RequestHandler = catchAsync(
+    async (req: any, res: any, next: NextFunction) => {
+        const data = await userService.deleteUserById(req.params.id);
+        return res.status(200).send({ status: "success", ...data });
+    }
+);
 
 // export const updatePassword: RequestHandler = catchAsync(async (req, res, next) => {
 //     const data = await userService.updatePassword(req.userId!, req.body)

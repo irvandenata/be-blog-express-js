@@ -3,10 +3,8 @@ import { Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 // db interfaces
 export interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
     id?: string;
-    firstName: string;
-    first_name?: string;
-    lastName: string;
-    last_name?: string;
+    firstName?: string;
+    lastName?: string;
     bio?: string;
     email: string;
     password: string;

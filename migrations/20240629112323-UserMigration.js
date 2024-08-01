@@ -42,6 +42,10 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false
             },
+            password_confirm: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
             is_verified: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,

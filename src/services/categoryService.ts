@@ -1,10 +1,12 @@
-import { Category } from "../models"
+// import { Category } from "../models"
 
 
-export default class CategoryService {
-    constructor() { }
+// export default class CategoryService {
+//     constructor() { }
 
-    public getCategories = async () => {
-        return await Category.findAll()
-    }
-}
+//     public getCategories = async () => {
+//         return await Category.findAll()
+//     }
+// }
+
+

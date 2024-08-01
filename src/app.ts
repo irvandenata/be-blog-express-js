@@ -14,6 +14,8 @@ if (process.env.NODE_ENV === "development") {
 };
 
 app.use(cors());
+
+
 // app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cookieParser());
 app.use(compression());
@@ -23,9 +25,11 @@ app.use(express.static(path.join(__dirname, "../", "images"))); // mengakses fol
 
 app.use(`/api/${process.env.API_VERSION}`, api);
 
-app.all("*", (res: Response) => {
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
     res.status(404).end();
 });
+
+
 app.use(ErrorHandler.convert());
 app.use(ErrorHandler.handle());
 

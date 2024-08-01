@@ -1,5 +1,4 @@
-import {z, ZodType} from 'zod';
-
+import { z, ZodType } from "zod";
 
 export class UserValidation {
     static readonly REGISTER: ZodType = z.object({
@@ -12,5 +11,10 @@ export class UserValidation {
         email: z.string().email(),
         password: z.string().min(8).max(255),
     });
+
+    static readonly FORGOT_PASSWORD: ZodType = z.object({
+        password: z.string().min(8).max(255),
+        passwordConfirm: z.string().min(8).max(255),
+        token: z.string()
+    });
 }
-    

@@ -1,32 +1,10 @@
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"Unauthorized","service":"user-service"}
-{"level":"error","message":"[object Object]","service":"user-service"}
-{"level":"error","message":"[object Object]","service":"user-service"}
-{"level":"error","message":"Cannot set property message of [object Object] which has only a getter","service":"user-service"}
-{"level":"error","message":"[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 8,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 8 character(s)\",\n    \"path\": [\n      \"password\"\n    ]\n  }\n]","service":"user-service"}
-{"level":"error","message":"[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 8,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 8 character(s)\",\n    \"path\": [\n      \"password\"\n    ]\n  }\n]","service":"user-service"}
-{"level":"error","message":"[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 8,\n    \"type\": \"string\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"String must contain at least 8 character(s)\",\n    \"path\": [\n      \"password\"\n    ]\n  }\n]","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"res.status is not a function","service":"user-service"}
-{"level":"error","message":"email : Invalid email. ","service":"user-service"}
-{"level":"error","message":"email : Invalid email. ","service":"user-service"}
-{"level":"error","message":"email : Invalid email. ","service":"user-service"}
-{"level":"error","message":"email : Invalid email. ","service":"user-service"}
-{"level":"error","message":"email : Invalid email. ","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}
+{"level":"error","message":"notNull Violation: First name is required,\nnotNull Violation: Last name is required,\nnotNull Violation: user.email cannot be null,\nnotNull Violation: Password is required,\nnotNull Violation: Password Confirm is required","service":"user-service"}

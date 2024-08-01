@@ -12,7 +12,7 @@ module.exports = {
 
         //use column name snake case
         
-        
+       
         await queryInterface.createTable('roles',{
             id: {
                 type: Sequelize.INTEGER,
@@ -35,7 +35,7 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-
+        await queryInterface.sequelize.query('ALTER SEQUENCE roles_id_seq RESTART WITH 1;');
         await queryInterface.dropTable('roles');
     }
 };

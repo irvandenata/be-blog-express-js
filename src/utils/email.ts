@@ -1,43 +1,69 @@
-import axios from "axios";
-import AppError from "./appError";
-import { EmailRequest, UserModel } from "../interfaces";
-
+import nodemailer from "nodemailer";
+import Mailgen from "mailgen";
+import { UserModel } from "../interfaces";
 
 export default class Email {
-    request: EmailRequest
-    constructor(user: UserModel, data: any, fromOption: string = `${process.env.SENDGRID_EMAIL_FROM}`) {
-        this.request = {
-            "from": {
-                "email": `blog.durmusdemirtas.com <${fromOption}>`
+    private transporter: nodemailer.Transporter;
+    private user: UserModel;
+    private data: any;
+
+    constructor(user: UserModel, data: any) {
+        this.transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_APP_USER,
+                pass: process.env.GMAIL_APP_PASSWORD,
             },
-            "reply_to": {
-                "email": `${process.env.SENDGRID_EMAIL_REPLY_TO}`
-            },
-            "personalizations": [
-                {
-                    "to": [{ "email": user.email }],
-                    "dynamic_template_data": { name: user.firstName.toUpperCase(), ...data }
-                }
-            ]
-        }
+        });
+
+        this.user = user;
+        this.data = data;
     }
 
-    private send = async (templateId: string) => {
-        this.request.template_id = templateId;
+    private send = async (message: nodemailer.SendMailOptions) => {
         try {
-            return await axios.post("https://api.sendgrid.com/v3/mail/send", this.request,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`
-                    }
-                });
-        } catch (err: any) {
-            throw new AppError(err.statusCode, err.message, false, err.name, err.stack)
+            const info = await this.transporter.sendMail(message);
+            return {
+                msg: "Email sent",
+                info: info.messageId,
+                preview: nodemailer.getTestMessageUrl(info),
+            };
+        } catch (err) {
+            return { msg: err };
         }
-    }
+    };
 
-    public sendEmailVerification = async () => {
-        await this.send(process.env.SENDGRID_VERIFICATION_TEMPLATE_ID);
-    }
+    public sendPasswordReset = async () => {
+        const MailGenerator = new Mailgen({
+            theme: "default",
+            product: {
+                name: "BLOG WEBSITE",
+                link: "google.com",
+            },
+        });
+
+        const response = {
+            body: {
+                name: this.user.firstName,
+                intro: "Your password reset request has been received. Please click the button below to reset your password.",
+                action: {
+                    instructions: `Click the button below to reset your password: ${this.data.verificationUrl}`,
+                    button: {
+                        color: "#22BC66",
+                        text: "Reset your password",
+                        link: "google.com",
+                    },
+                },
+            },
+        };
+
+        const mail = MailGenerator.generate(response);
+        const message: nodemailer.SendMailOptions = {
+            from: "irvan17051999@gmail.com",
+            to: "irvandta@gmail.com",
+            subject: "Password Reset",
+            html: mail,
+        };
+        await this.send(message);
+    };
 }

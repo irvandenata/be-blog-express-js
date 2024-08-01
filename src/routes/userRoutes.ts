@@ -1,16 +1,10 @@
 import { Router } from "express";
 import {
     getUsers,
-    // updateProfile,
-    // updatePassword,
-    // getUserBlogs,
-    // getUserBlogById,
-    // createBlog,
-    // updateBlog,
-    // deleteBlog,
-    // clapBlog,
-    // createReview,
-    // updateReview
+    getUserById,
+    updateProfile,
+    createUser,
+    deleteUserById,
 } from "../controllers/userControllers"
 import authorizeOnly from "../middlewares/athorizeOnly"
 import uploadSingleFile from "../middlewares/uploadSingleFile"
@@ -20,6 +14,10 @@ const router = Router()
 
 router
 .get("/",authorizeOnly( "Admin"),getUsers)
+.post("/",authorizeOnly( "Admin"),createUser)
+.get("/:id",authorizeOnly( "Admin"),getUserById)
+.patch("/:id",authorizeOnly( "Admin"),updateProfile)
+.delete("/:id",authorizeOnly( "Admin"),deleteUserById)
     // user's profile and security
     // .post("/",
     //     uploadSingleFile("profileImage", "memory"),

@@ -1,311 +1,282 @@
 import fs from "fs";
-import bcrypt from "bcrypt";
 import { Op } from "sequelize";
-import { Blog, User } from "../models";
+import { Blog, Role, User } from "../models";
 import AppError from "../utils/appError";
 import {
-	ProfileData,
-	File,
-	PasswordData,
-	BlogFilter,
-	BlogData,
-	ReviewModel,
-	UserFilter,
+    ProfileData,
+    File,
+    PasswordData,
+    BlogFilter,
+    BlogData,
+    ReviewModel,
+    UserFilter,
     UserInterface,
     UserModel,
 } from "../interfaces";
 
 export default class UserService {
-	constructor() {}
+    constructor() {}
 
-	public getUsers = async (
-		query: UserFilter,
-		protocol: string,
-		host: string
-	) => {
-		const hostName = protocol + "://" + host;
-		const { limit, offset } = this.paginate(query.page, query.limit);
-		const sk = query.q ? query.q : "";
-		console.log("sk", sk);
-		return (
-			await User.findAll({
-				where: {
-					[Op.or]: [
-						{
-							first_name: {
-								[Op.iLike]: `%${sk}%`,
-							},
-						},
-						{
-							last_name: {
-								[Op.iLike]: `%${sk}%`,
-							},
-						},
-					],
-				},
-				attributes: ["id", "first_name", "last_name", "profile_image"],
-				limit,
-				offset,
-			})
-		).map((user: any) => {
-			user.profile_image = user.profile_image
-				? hostName + "/" + user.profile_image
-				: null;
-			return user;
-		});
-	};
+    /**
+     * @function getUsers
+     * @summary Retrieves a list of users
+     * @param {UserFilter} query - The query parameters for filtering the users
+     * @param {string} protocol - The protocol used in the request
+     * @param {string} host - The host used in the request
+     * @return {UserInterface[]} - An array of user objects
+     */
+    public getUsers = async (
+        query: UserFilter,
+        protocol: string,
+        host: string
+    ) => {
+        const hostName = protocol + "://" + host;
+        const { limit, offset } = this.paginate(query.page, query.limit);
+        const sk = query.q ? query.q : "";
+        return (
+            await User.findAll({
+                where: {
+                    [Op.or]: [
+                        {
+                            firstName: {
+                                [Op.iLike]: `%${sk}%`,
+                            },
+                        },
+                        {
+                            lastName: {
+                                [Op.iLike]: `%${sk}%`,
+                            },
+                        },
+                    ],
+                },
+                //include role data
+                include: [
+                    {
+                        model: Role,
+                        required: true,
+                        attributes: ["name"],
+                        as: "role",
+                    },
+                ],
+                attributes: [
+                    "id",
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "profileImage",
+                ],
+                limit,
+                offset,
+            })
+        ).map((user: any) => {
+            user.profile_image = user.profile_image
+                ? hostName + "/" + user.profile_image
+                : null;
+            return user;
+        });
+    };
 
-	public createUser = async (
-		userId: string,
-		protocol: string,
-		host: string,
-		data: UserModel,
-		file?: File
-	) => {
-		const hostName = protocol + "://" + host;
-		let profileImage = "";
-		if (file) {
-			profileImage = hostName + "/" + file.filepath;
-			let oldPath: string = "";
-			if (data.oldImage) {
-				oldPath = `./images/${data.oldImage.slice(hostName.length + 1)}`;
-			}
-			this.deleteFileIfExists(oldPath);
-		}
-	};
+    /**
+     * @function createUser
+     * @summary Creates a new user
+     * @param {string} protocol - The protocol used in the request
+     * @param {string} host - The host used in the request
+     * @param {UserModel} data - The user data to be created
+     * @param {File} file - The file to be uploaded
+     * @return {string} host - The host used in the request
+     */
+    public createUser = async (
+        protocol: string,
+        host: string,
+        data: UserModel,
+        file?: File
+    ) => {
+        const hostName = protocol + "://" + host;
+        let profileImage = "";
+        if (file) {
+            profileImage = hostName + "/" + file.filepath;
+            let oldPath: string = "";
+            if (data.oldImage) {
+                oldPath = `./images/${data.oldImage.slice(
+                    hostName.length + 1
+                )}`;
+            }
+            this.deleteFileIfExists(oldPath);
+        }
+        const result: UserModel = await User.create(
+            { profile_image: profileImage, ...data },
+            {
+                returning: true,
+            }
+        );
+        return {
+            id: result.id,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email,
+            profileImage: result.profileImage,
+            role: result.role,
+        };
+    };
 
-	// public updateProfile = async (
-	// 	userId: string,
-	// 	protocol: string,
-	// 	host: string,
-	// 	data: ProfileData,
-	// 	file?: File
-	// ) => {
-	// 	const hostName = protocol + "://" + host;
-	// 	let profileImage = "";
-	// 	if (file) {
-	// 		profileImage = hostName + "/" + file.filepath;
-	// 		let oldPath: string = "";
-	// 		if (data.oldImage) {
-	// 			oldPath = `./images/${data.oldImage.slice(hostName.length + 1)}`;
-	// 		}
-	// 		this.deleteFileIfExists(oldPath);
-	// 	}
-	// 	const newValues = { profileImage, ...data };
-	// 	Object.keys(newValues).forEach((key: string) => {
-	// 		if (!newValues[key as keyof ProfileData]) {
-	// 			delete newValues[key as keyof ProfileData];
-	// 		}
-	// 	});
-	// 	const user = await User.update(newValues, {
-	// 		where: { id: userId },
-	// 		returning: ["first_name", "last_name", "bio", "profile_image"],
-	// 		// raw: true
-	// 	});
-	// 	return user[1][0];
-	// };
+    /**
+     * @function getUserById
+     * @summary Retrieves a user by id
+     * @param {string} id - The id of the user to be retrieved
+     * @return {UserInterface} - A user object
+     */
+    public getUserById = async (id: string) => {
+        const result = await User.findByPk(id, {
+            attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "email",
+                "profileImage",
+            ],
+            include: [
+                {
+                    model: Role,
+                    required: true,
+                    attributes: ["name"],
+                    as: "role",
+                },
+            ],
+        });
+        if (!result) {
+            throw new AppError(404, "User not found");
+        }
+        return result;
+    };
 
-	// public updatePassword = async (userId: string, data: PasswordData) => {
-	// 	const { oldPassword, password, passwordConfirm } = data;
-	// 	if (!oldPassword) {
-	// 		throw new AppError(400, "Current password must be provided");
-	// 	}
-	// 	const user = await User.findOne({
-	// 		where: { id: userId },
-	// 		attributes: ["password"],
-	// 	});
-	// 	var passwordIsValid = bcrypt.compareSync(oldPassword, user!.password);
-	// 	if (!passwordIsValid) {
-	// 		throw new AppError(400, "Current password is incorrect");
-	// 	}
-	// 	// check if password and passwordConfirm match
-	// 	if (password !== passwordConfirm) {
-	// 		throw new AppError(400, "Passwords do not match");
-	// 	}
-	// 	// check if old and new passwords are the same
-	// 	if (password === oldPassword) {
-	// 		throw new AppError(
-	// 			400,
-	// 			"New password cannot be same as the old password"
-	// 		);
-	// 	}
-	// 	// update password
-	// 	await User.update(
-	// 		{
-	// 			password: bcrypt.hashSync(
-	// 				password,
-	// 				Number(process.env.PASSWORD_HASH_CYCLE)
-	// 			),
-	// 		},
-	// 		{ where: { id: userId } }
-	// 	);
-	// 	return "";
-	// };
+    /**
+     * @function updateUserById
+     * @summary Updates a user by id
+     * @param {string} userId - The id of the user to be updated
+     * @param {string} protocol - The protocol used in the request
+     * @param {string} host - The host used in the request
+     * @param {UserModel} data - The user data to be updated
+     * @param {File} file - The file to be uploaded
+     * @throws {AppError} - If the passwords do not match
+     * @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+     */
+    public updateUserById = async (
+        userId: string,
+        protocol: string,
+        host: string,
+        data: UserModel,
+        file?: File
+    ) => {
+        const hostName = protocol + "://" + host;
 
-	// public getUserBlogs = async (authorId: string, query: BlogFilter) => {
-	// 	const { limit, offset } = this.paginate(query.page, query.limit);
-	// 	const sk = query.q ? query.q : "";
-	// 	return await Blog.findAll({
-	// 		where: {
-	// 			authorId,
-	// 			[Op.or]: [
-	// 				{
-	// 					title: {
-	// 						[Op.iLike]: `%${sk}%`,
-	// 					},
-	// 				},
-	// 				{
-	// 					keywords: {
-	// 						[Op.iLike]: `%${sk}%`,
-	// 					},
-	// 				},
-	// 			],
-	// 		},
-	// 		attributes: { exclude: ["authorId", "slug", "categoryId", "content"] },
-	// 		limit,
-	// 		offset,
-	// 	});
-	// };
+        let checkMatchingPassword: boolean =
+            data.password === data.passwordConfirm;
+        if (!checkMatchingPassword) {
+            throw new AppError(400, "Passwords do not match");
+        }
+        let profileImage = "";
+        if (file) {
+            profileImage = hostName + "/" + file.filepath;
+            let oldPath: string = "";
+            if (data.oldImage) {
+                oldPath = `./images/${data.oldImage.slice(
+                    hostName.length + 1
+                )}`;
+            }
+            this.deleteFileIfExists(oldPath);
+        }
 
-	// public getUserBlogById = async (authorId: string, id: number) => {
-	// 	this.isPropertyNaN(id, "blog");
-	// 	return await Blog.findOne({
-	// 		where: { id, authorId },
-	// 		include: [
-	// 			{
-	// 				model: Category,
-	// 				required: true,
-	// 				attributes: ["name"],
-	// 			},
-	// 		],
-	// 	});
-	// };
+        const newValues = { profileImage, ...data };
+        Object.keys(newValues).forEach((key: string) => {
+            if (!newValues[key as keyof ProfileData]) {
+                delete newValues[key as keyof ProfileData];
+            }
+        });
 
-	// public createBlog = async (
-	// 	authorId: string,
-	// 	protocol: string,
-	// 	host: string,
-	// 	data: BlogData,
-	// 	file?: File
-	// ) => {
-	// 	const hostName = protocol + "://" + host;
-	// 	let image = "";
-	// 	if (file) {
-	// 		image = hostName + "/" + file.filepath;
-	// 	}
-	// 	return await Blog.create({ authorId, image, ...data });
-	// };
+        const user = await User.update(newValues, {
+            where: { id: userId },
+            returning: true,
+        });
 
-	// public updateBlog = async (
-	// 	id: number,
-	// 	authorId: string,
-	// 	protocol: string,
-	// 	host: string,
-	// 	data: BlogData,
-	// 	file?: File
-	// ) => {
-	// 	this.isPropertyNaN(id, "blog");
-	// 	const hostName = protocol + "://" + host;
-	// 	let image = "";
-	// 	if (file) {
-	// 		image = hostName + "/" + file.filepath;
-	// 		let oldPath: string = "";
-	// 		if (data.oldImage) {
-	// 			oldPath = `./images/${data.oldImage.slice(hostName.length + 1)}`;
-	// 		}
-	// 		this.deleteFileIfExists(oldPath);
-	// 	}
-	// 	const newValues = { image, ...data };
-	// 	// console.log("---", newValues)
-	// 	Object.keys(newValues).forEach((key: string) => {
-	// 		if (!newValues[key as keyof BlogData]) {
-	// 			delete newValues[key as keyof BlogData];
-	// 		}
-	// 	});
-	// 	const blog = await Blog.update(newValues, {
-	// 		where: { id, authorId },
-	// 		returning: true,
-	// 		// raw: true
-	// 	});
-	// 	return blog[1][0];
-	// };
+        if (!user[1][0]) {
+            throw new AppError(404, "User not found");
+        }
 
-	// public deleteBlog = async (id: number, authorId: number) => {
-	// 	this.isPropertyNaN(id, "blog");
-	// 	await Blog.update(
-	// 		{
-	// 			blogStatus: "passive",
-	// 		},
-	// 		{ where: { id, authorId } }
-	// 	);
-	// 	return "";
-	// };
+        const result = {
+            id: user[1][0].id,
+            firstName: user[1][0].firstName,
+            lastName: user[1][0].lastName,
+            email: user[1][0].email,
+        };
+        return result;
+    };
 
-	// public clapBlog = async (id: number, userId: number) => {
-	// 	this.isPropertyNaN(id, "blog");
-	// 	const blog = await Blog.findByPk(id, { attributes: ["authorId"] });
-	// 	if (!blog) throw new AppError(400, "Blog not found");
-	// 	if (blog.authorId === userId)
-	// 		throw new AppError(400, "You can't clap your own blog");
-	// 	await Blog.increment("clapCount", { by: 1, where: { id } });
-	// 	return "";
-	// };
+    /**
+     * @function deleteUserById
+     * @summary Deletes a user by id
+     * @param {string} userId - The id of the user to be deleted
+     * @throws {AppError} - If the user is not found
+     * @return {string} - A string indicating that the user has been deleted
+     */
+    public deleteUserById = async (userId: string) => {
+        User.destroy({
+            where: {
+                id: userId,
+            },
+        }).catch((err) => {
+            throw new AppError(400, "User not found");
+        });
 
-	// public createReview = async (userId: string, data: ReviewModel) => {
-	// 	if (!data.blogId) throw new AppError(400, "Blog id must be provided");
-	// 	this.isPropertyNaN(data.blogId, "blog");
-	// 	const blog = await Blog.findByPk(data.blogId, { attributes: ["authorId"] });
-	// 	if (!blog) throw new AppError(400, "Blog not found");
-	// 	if (blog.authorId === userId)
-	// 		throw new AppError(400, "You can't review for your own blog");
-	// 	return await Review.create({ ownerId: userId, ...data });
-	// };
+        return { message: "User deleted" };
+    };
 
-	// public updateReview = async (
-	// 	id: number,
-	// 	userId: string,
-	// 	data: ReviewModel
-	// ) => {
-	// 	this.isPropertyNaN(id, "review");
-	// 	const review = await Review.findByPk(id, { attributes: ["ownerId"] });
-	// 	if (!review) throw new AppError(400, "Review not found");
-	// 	if (review.ownerId !== userId)
-	// 		throw new AppError(400, "You can only update your own review");
-	// 	if (!data.content)
-	// 		throw new AppError(400, "Review content must be provided");
-	// 	const updated = await Review.update(data, {
-	// 		where: { id, ownerId: userId },
-	// 		returning: ["content"],
-	// 		// raw: true
-	// 	});
-	// 	return updated[1][0];
-	// };
+    /**
+     * @function deleteFileIfExists
+     * @summary Deletes a file if it exists
+     * @param {string} path - The path of the file to be deleted
+     * @return {void}
+     */
+    private deleteFileIfExists = (path: string | "") => {
+        if (path) {
+            fs.access(path, function (err: any) {
+                if (!err) {
+                    fs.unlink(path, (e) => {});
+                }
+            });
+        }
+        return;
+    };
 
-	private deleteFileIfExists = (path: string | "") => {
-		if (path) {
-			fs.access(path, function (err: any) {
-				if (!err) {
-					fs.unlink(path, (e) => {});
-				}
-			});
-		}
-		return;
-	};
+    /**
+     * @function paginate
+     * @summary Paginates the data
+     * @param {number} clientPage - The page number
+     * @param {number} clientLimit - The limit of data to be displayed
+     * @param {number} maxLimit - The maximum limit of data to be displayed
+     * @return {number} clientLimit - The limit of data to be displayed
+     */
+    private paginate = (
+        clientPage: number = 1,
+        clientLimit: number = 10,
+        maxLimit: number = 100
+    ) => {
+        if (!clientPage) clientPage = 1;
+        if (!clientLimit) clientLimit = 10;
+        let limit = +clientLimit < +maxLimit ? clientLimit : +maxLimit;
+        let offset = (+clientPage - 1) * +limit;
+        return { limit, offset };
+    };
 
-	private paginate = (
-		clientPage: number = 1,
-		clientLimit: number = 10,
-		maxLimit: number = 100
-	) => {
-		if (!clientPage) clientPage = 1;
-		if (!clientLimit) clientLimit = 10;
-		let limit = +clientLimit < +maxLimit ? clientLimit : +maxLimit;
-		let offset = (+clientPage - 1) * +limit;
-		return { limit, offset };
-	};
-
-	private isPropertyNaN = (prop: any, name: string) => {
-		if (isNaN(prop)) throw new AppError(400, `Invalid ${name} id`);
-		return;
-	};
+    /**
+     * @function isPropertyNaN
+     * @summary Checks if a property is NaN
+     * @param {any} prop - The property to be checked
+     * @param {string} name - The name of the property
+     * @throws {AppError} - If the property is NaN
+     * @return {void}
+     */
+    private isPropertyNaN = (prop: any, name: string) => {
+        if (isNaN(prop)) throw new AppError(400, `Invalid ${name} id`);
+        return;
+    };
 }
