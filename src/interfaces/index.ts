@@ -101,7 +101,7 @@ export interface File {
     mimetype: string;
     buffer: Buffer;
     size: number;
-    filepath?: string
+    path?: string
 }
 export interface ProfileData {
     firstName: string;

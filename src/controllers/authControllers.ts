@@ -2,6 +2,7 @@ import { NextFunction, RequestHandler } from "express";
 import catchAsync from "../utils/catchAsync";
 import AuthService from "../services/authService";
 import { CLIENT_URL } from "../config";
+
 const authService = new AuthService();
 
 export const register: RequestHandler = catchAsync(async (req, res, next) => {

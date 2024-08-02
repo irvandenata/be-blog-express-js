@@ -1,10 +1,10 @@
 import { Request } from "express";
-import { User } from "../interfaces/index";
+import { UserInterface  } from "../interfaces/index";
 
 declare module "express" {
 	interface Request {
 		userId?: string;
-		user?: User;
+		user?: UserInterface ;
 		file?: {
 			filename: string;
 			fieldname: string;
@@ -13,7 +13,7 @@ declare module "express" {
 			mimetype: string;
 			buffer: Buffer;
 			size: number;
-			filepath?: string;
+			path?: string;
 		};
 	}
 }

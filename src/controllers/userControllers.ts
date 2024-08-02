@@ -34,7 +34,7 @@ export const getUserById: RequestHandler = catchAsync(
     }
 );
 
-export const updateProfile: RequestHandler = catchAsync(
+export const updateUserById: RequestHandler = catchAsync(
     async (req, res, next) => {
         const data = await userService.updateUserById(
             req.params.id!,

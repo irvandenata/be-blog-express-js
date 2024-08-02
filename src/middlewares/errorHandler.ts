@@ -178,7 +178,6 @@ export default class ErrorHandler {
             if (!res.headersSent) {
 
                 if (err.statusCode === 400) {
-                    console.log(err.message);
                     err["errors"] = err.message.split("\n").map((message) => {
                         return message;
                     });

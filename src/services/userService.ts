@@ -94,7 +94,7 @@ export default class UserService {
         const hostName = protocol + "://" + host;
         let profileImage = "";
         if (file) {
-            profileImage = hostName + "/" + file.filepath;
+            profileImage = hostName + "/" + file.path;
             let oldPath: string = "";
             if (data.oldImage) {
                 oldPath = `./images/${data.oldImage.slice(
@@ -167,22 +167,18 @@ export default class UserService {
         data: UserModel,
         file?: File
     ) => {
+        const currentUser = await User.findByPk(userId);
         const hostName = protocol + "://" + host;
-
         let checkMatchingPassword: boolean =
             data.password === data.passwordConfirm;
         if (!checkMatchingPassword) {
             throw new AppError(400, "Passwords do not match");
         }
+
         let profileImage = "";
         if (file) {
-            profileImage = hostName + "/" + file.filepath;
-            let oldPath: string = "";
-            if (data.oldImage) {
-                oldPath = `./images/${data.oldImage.slice(
-                    hostName.length + 1
-                )}`;
-            }
+            profileImage = file.path!;
+            let oldPath: string = currentUser!.profileImage!;
             this.deleteFileIfExists(oldPath);
         }
 
@@ -198,7 +194,7 @@ export default class UserService {
             returning: true,
         });
 
-        if (!user[1][0]) {
+        if (user != null && user[0] === 0) {
             throw new AppError(404, "User not found");
         }
 
@@ -237,6 +233,7 @@ export default class UserService {
      * @return {void}
      */
     private deleteFileIfExists = (path: string | "") => {
+
         if (path) {
             fs.access(path, function (err: any) {
                 if (!err) {
