@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import slugify from "slugify";
 import AppError from "../utils/appError";
 import { File } from "../interfaces";
 import fs from "fs";
