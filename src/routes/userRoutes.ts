@@ -13,25 +13,23 @@ const router = Router();
 
 router
     .get("/", authorizeOnly("Admin"), getUsers)
-    .post("/", authorizeOnly("Admin"), createUser)
-    .get(
-        "/:id",
+    .post(
+        "/",
         authorizeOnly("Admin"),
-        uploadSingleFile("profileImage", "disk", "users"),
-        resizeSignleImage("profileImage", "users", 200, 200),
-        getUserById
+        uploadSingleFile("profileImage","disk", "users"),
+        resizeSignleImage(0,0,100),
+        createUser
     )
+    .get("/:id", getUserById)
     .patch(
         "/:id",
         authorizeOnly("Admin"),
-
-        uploadSingleFile("profileImage", "disk", "users"),
-        resizeSignleImage("profileImage", "users", 200, 200),
+        uploadSingleFile("profileImage","disk", "users"),
+        resizeSignleImage(0,0,100),
         updateUserById
     )
     .delete("/:id", authorizeOnly("Admin"), deleteUserById);
 
-    
 // user's profile and security
 // .post("/",
 //     uploadSingleFile("profileImage", "memory"),

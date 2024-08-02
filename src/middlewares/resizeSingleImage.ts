@@ -7,42 +7,29 @@ import catchAsync from "../utils/catchAsync";
 import path from "path";
 
 const resizeSignleImage = (
-    name: string,
-    path: string,
-    width?: number,
-    height?: number,
-    quality?: number,
-    format: "jpeg" | "png" | "jpg" = "jpg"
+width?: number,
+height?: number,
+quality?: number,
+format: "jpeg" | "png" | "jpg" = "jpg"
 ) => {
     return catchAsync(
         async (req: Request, res: Response, next: NextFunction) => {
             if (!req.file) return next();
-            let fileSlug = name;
-
-            if (name === "profileImage")
-                fileSlug = slugify(
-                    `${req.user!.firstName} ${req.user!.lastName}`,
-                    { lower: true }
-                );
-            if (name === "blogImage")
-                fileSlug = slugify(
-                    `${
-                        req.body.title ? req.body.title : req.file.originalname
-                    }`,
-                    { lower: true }
-                );
-
             let filePath: string = req.file.path!;
-
+            width = width || 0;
+            height = height || 0;
+            quality = quality || 0;
             fs.readFile(filePath, (err, data) => {
                 if (err) throw err;
                 Jimp.read(data)
                     .then((image) => {
-                        // Manipulasi gambar
-                        return image
-                            .resize(256, 256) // Ubah ukuran
-                            .quality(60) // Atur kualitas
-                            .writeAsync(filePath); // Simpan gambar
+                        if (width && height) {
+                            image.resize(width, height);
+                        }
+                        if (quality) {
+                            image.quality(quality);
+                        }
+                        return image.writeAsync(filePath);
                     })
                     .catch((err) => {
                         console.error(err);

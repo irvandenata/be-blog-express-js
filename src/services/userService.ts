@@ -92,16 +92,9 @@ export default class UserService {
         file?: File
     ) => {
         const hostName = protocol + "://" + host;
-        let profileImage = "";
+        let profileImage: string = "";
         if (file) {
-            profileImage = hostName + "/" + file.path;
-            let oldPath: string = "";
-            if (data.oldImage) {
-                oldPath = `./images/${data.oldImage.slice(
-                    hostName.length + 1
-                )}`;
-            }
-            this.deleteFileIfExists(oldPath);
+            profileImage = file.path!;
         }
         const result: UserModel = await User.create(
             { profile_image: profileImage, ...data },
@@ -203,6 +196,7 @@ export default class UserService {
             firstName: user[1][0].firstName,
             lastName: user[1][0].lastName,
             email: user[1][0].email,
+            profileImage: hostName + "/" + user[1][0].profileImage,
         };
         return result;
     };
@@ -233,7 +227,6 @@ export default class UserService {
      * @return {void}
      */
     private deleteFileIfExists = (path: string | "") => {
-
         if (path) {
             fs.access(path, function (err: any) {
                 if (!err) {

@@ -9,33 +9,18 @@ import fs from "fs";
 // configure disk storage option
 const storeOnDisk = (path?: string) => {
     // create folder if not exist
-
-    const dir = path ? `images/${path}` : "images";
+    const dir = path ? `public/uploads/images/${path}` : "public/uploads/images/";
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
     return multer.diskStorage({
         destination: (req: Request, file: File, cb: Function) => {
-            cb(null, path ? `images/${path}` : "images");
+            cb(null, path ? `public/uploads/images/${path}` : "public/uploads/images/");
         },
         filename: (req: Request, file: File, cb: Function) => {
             const ext = file.mimetype.split("/")[1];
             let fileName: string;
-            if (file.fieldname === "profileImage") {
-                const userName = slugify(
-                    `${req.user!.firstName} ${req.user!.lastName}`,
-                    { lower: true }
-                );
-                fileName = userName + "-" + uuidv4() + `.${ext}`;
-            } else {
-                fileName =
-                    file.fieldname +
-                    "-" +
-                    uuidv4() +
-                    "-" +
-                    file.originalname.toLowerCase().split(" ").join("-") +
-                    `.${ext}`;
-            }
+            fileName = path + "-" + uuidv4() + "-" + `.${ext}`;
             cb(null, fileName);
         },
     });
@@ -60,7 +45,7 @@ const fileFilter = (req: Request, file: File, cb: Function) => {
 };
 
 const uploadSingleFile = (
-    name: string,
+    fieldName: string,
     strType: "memory" | "disk",
     path?: string
 ) => {
@@ -71,7 +56,7 @@ const uploadSingleFile = (
                     ? memoryStorage
                     : storeOnDisk(path),
             fileFilter: fileFilter,
-        }).single(name);
+        }).single(fieldName);
         return upload(req, res, function (err) {
             if (err) {
                 // handle file count limit error exclusively
