@@ -1,18 +1,8 @@
 import fs from "fs";
 import { Op } from "sequelize";
-import { Blog, Role, User } from "../models";
+import { Role, User } from "../models";
 import AppError from "../utils/appError";
-import {
-    ProfileData,
-    File,
-    PasswordData,
-    BlogFilter,
-    BlogData,
-    ReviewModel,
-    UserFilter,
-    UserInterface,
-    UserModel,
-} from "../interfaces";
+import { ProfileData, File, UserFilter, UserModel } from "../interfaces";
 
 export default class UserService {
     constructor() {}
@@ -32,48 +22,67 @@ export default class UserService {
     ) => {
         const hostName = protocol + "://" + host;
         const { limit, offset } = this.paginate(query.page, query.limit);
+
         const sk = query.q ? query.q : "";
-        return (
-            await User.findAll({
-                where: {
-                    [Op.or]: [
-                        {
-                            firstName: {
-                                [Op.iLike]: `%${sk}%`,
-                            },
-                        },
-                        {
-                            lastName: {
-                                [Op.iLike]: `%${sk}%`,
-                            },
-                        },
-                    ],
-                },
-                //include role data
-                include: [
+        const totalData = await User.count({
+            where: {
+                [Op.or]: [
                     {
-                        model: Role,
-                        required: true,
-                        attributes: ["name"],
-                        as: "role",
+                        firstName: {
+                            [Op.iLike]: `%${sk}%`,
+                        },
+                    },
+                    {
+                        lastName: {
+                            [Op.iLike]: `%${sk}%`,
+                        },
                     },
                 ],
-                attributes: [
-                    "id",
-                    "firstName",
-                    "lastName",
-                    "email",
-                    "profileImage",
-                ],
-                limit,
-                offset,
-            })
-        ).map((user: any) => {
-            user.profile_image = user.profile_image
-                ? hostName + "/" + user.profile_image
-                : null;
-            return user;
+            },
         });
+        const result = await User.findAll({
+            where: {
+                [Op.or]: [
+                    {
+                        firstName: {
+                            [Op.iLike]: `%${sk}%`,
+                        },
+                    },
+                    {
+                        lastName: {
+                            [Op.iLike]: `%${sk}%`,
+                        },
+                    },
+                ],
+            },
+            //include role data
+            include: [
+                {
+                    model: Role,
+                    required: true,
+                    attributes: ["name"],
+                    as: "role",
+                },
+            ],
+            attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "email",
+                "profileImage",
+            ],
+            limit,
+            offset,
+        });
+
+        return {
+            rows: result,
+            page: offset / limit + 1,
+            limit: limit,
+            count: totalData,
+            totalData: totalData,
+            totalPages: Math.ceil(totalData / (query.limit || 10)),
+        };
     };
 
     /**
@@ -94,14 +103,16 @@ export default class UserService {
         const hostName = protocol + "://" + host;
         let profileImage: string = "";
         if (file) {
-            profileImage = file.path!;
+            profileImage = file.path!.replace("public/uploads/", "");
         }
+
         const result: UserModel = await User.create(
-            { profile_image: profileImage, ...data },
+            { profileImage: profileImage, ...data },
             {
                 returning: true,
             }
         );
+
         return {
             id: result.id,
             firstName: result.firstName,
@@ -126,6 +137,7 @@ export default class UserService {
                 "lastName",
                 "email",
                 "profileImage",
+                "imageUrl",
             ],
             include: [
                 {
@@ -170,9 +182,11 @@ export default class UserService {
 
         let profileImage = "";
         if (file) {
-            profileImage = file.path!;
-            let oldPath: string = currentUser!.profileImage!;
-            this.deleteFileIfExists(oldPath);
+            profileImage = file.path!.replace("public/uploads/", "");
+            if (currentUser?.profileImage) {
+                const oldPath = `public/uploads/${currentUser.profileImage}`;
+                this.deleteFileIfExists(oldPath);
+            }
         }
 
         const newValues = { profileImage, ...data };
@@ -185,6 +199,7 @@ export default class UserService {
         const user = await User.update(newValues, {
             where: { id: userId },
             returning: true,
+            individualHooks: true,
         });
 
         if (user != null && user[0] === 0) {
@@ -196,7 +211,7 @@ export default class UserService {
             firstName: user[1][0].firstName,
             lastName: user[1][0].lastName,
             email: user[1][0].email,
-            profileImage: hostName + "/" + user[1][0].profileImage,
+            profileImage: user[1][0].profileImage,
         };
         return result;
     };
@@ -209,14 +224,20 @@ export default class UserService {
      * @return {string} - A string indicating that the user has been deleted
      */
     public deleteUserById = async (userId: string) => {
-        User.destroy({
-            where: {
-                id: userId,
-            },
-        }).catch((err) => {
-            throw new AppError(400, "User not found");
-        });
+        await User.findByPk(userId).then(async (user) => {
+            if (!user) {
+                throw new AppError(404, "User not found");
+            }
+            console.log(user);
 
+            if (user!.profileImage) {
+                const oldPath = `public/uploads/${user.previous(
+                    "profileImage"
+                )}`;
+                await this.deleteFileIfExists(oldPath);
+            }
+            await user.destroy();
+        });
         return { message: "User deleted" };
     };
 

@@ -13,6 +13,7 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
         */
+        await queryInterface.bulkDelete('users',null,{});
 
         await queryInterface.bulkInsert('roles',[
             {

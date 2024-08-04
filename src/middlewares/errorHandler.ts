@@ -128,7 +128,7 @@ export default class ErrorHandler {
         if (err.statusCode === 400) {
             console.log(err.message);
             err["messages"] = err.message.split("\n").map((message) => {
-                return message;
+                return message.replace("notNull Violation: ", "").replace("Validation error: ", "");
             });
         }
         logging.error(err.message, err.stack);
@@ -179,7 +179,7 @@ export default class ErrorHandler {
 
                 if (err.statusCode === 400) {
                     err["errors"] = err.message.split("\n").map((message) => {
-                        return message;
+                        return message.replace("notNull Violation: ", "").replace("Validation error: ", "");
                     });
                     err.message = "Invalid input data. Please try again!";
                 }

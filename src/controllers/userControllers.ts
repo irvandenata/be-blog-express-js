@@ -1,8 +1,9 @@
 import { NextFunction, RequestHandler } from "express";
 import catchAsync from "../utils/catchAsync";
 import UserService from "../services/userService";
-import { UserModel } from "../interfaces";
+import { responseFormatter } from "../utils/helpers";
 const userService = new UserService();
+
 
 export const getUsers: RequestHandler = catchAsync(
     async (req: any, res: any, next: NextFunction) => {
@@ -11,26 +12,27 @@ export const getUsers: RequestHandler = catchAsync(
             req.protocol,
             req.get("host")!
         );
-        return res.status(200).send({ status: "success", data });
+        return res.status(200).send(responseFormatter("success", data, "fetch"));
     }
 );
 
 export const createUser: RequestHandler = catchAsync(
     async (req: any, res: any, next: NextFunction) => {
+
         const data = await userService.createUser(
             req.protocol,
             req.get("host")!,
             req.body,
             req.file!
         );
-        return res.status(201).send({ status: "success", data });
+        return res.status(201).send(responseFormatter("success", data, "single"));
     }
 );
 
 export const getUserById: RequestHandler = catchAsync(
     async (req: any, res: any, next: NextFunction) => {
         const data = await userService.getUserById(req.params.id);
-        return res.status(200).send({ status: "success", data });
+        return res.status(200).send(responseFormatter("success", data, "single"));
     }
 );
 
@@ -43,14 +45,14 @@ export const updateUserById: RequestHandler = catchAsync(
             req.body,
             req.file!
         );
-        return res.status(200).send({ status: "success", data });
+        return res.status(200).send(responseFormatter("success", data, "single"));
     }
 );
 
 export const deleteUserById: RequestHandler = catchAsync(
     async (req: any, res: any, next: NextFunction) => {
         const data = await userService.deleteUserById(req.params.id);
-        return res.status(200).send({ status: "success", ...data });
+        return res.status(200).send(responseFormatter("success", data, "single"));
     }
 );
 

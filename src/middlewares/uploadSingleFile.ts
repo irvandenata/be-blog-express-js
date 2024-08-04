@@ -19,7 +19,7 @@ const storeOnDisk = (path?: string) => {
         filename: (req: Request, file: File, cb: Function) => {
             const ext = file.mimetype.split("/")[1];
             let fileName: string;
-            fileName = path + "-" + uuidv4() + "-" + `.${ext}`;
+            fileName = path + "-" + uuidv4() + `.${ext}`;
             cb(null, fileName);
         },
     });

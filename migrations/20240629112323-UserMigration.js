@@ -22,7 +22,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
-                    model: 'roles',
+                    model: {
+                        tableName: 'roles',
+                        schema: 'public',
+                    },
                     key: 'id'
                 }
             },
@@ -72,6 +75,8 @@ module.exports = {
                 defaultValue: Sequelize.fn('now')
             }
         });
+
+
     },
 
     async down(queryInterface,Sequelize)

@@ -1,5 +1,5 @@
 import catchAsync from '../utils/catchAsync'
-import BlogService from "../services/blogService"
+import BlogService from "../services/ArticleService"
 const blogService = new BlogService()
 
 

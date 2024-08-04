@@ -6,15 +6,15 @@ import cors from "cors"; // middleware yang memungkinkan aplikasi untuk menerima
 // import helmet from "helmet"; // middleware yang membantu melindungi aplikasi dengan mengatur berbagai header HTTP
 import morgan from "morgan"; // middleware logger HTTP untuk node.js
 import api from "./api"; // import api from folder api
-import ErrorHandler from "./middlewares/errorHandler"
+import ErrorHandler from "./middlewares/errorHandler";
+import fs from "fs";
 const app: Application = express();
 
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
-};
+}
 
 app.use(cors());
-
 
 // app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cookieParser());
@@ -24,11 +24,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../", "images"))); // mengakses folder images
 
 app.use(`/api/${process.env.API_VERSION}`, api);
+app.all("/storages/*", (req: Request, res: Response, next: NextFunction) => {
+    const filePath: string = path.join(
+        __dirname,
+        "../",
+        req.url.replace("/storages", "/public/uploads")
+    );
 
-app.all("*", (req: Request, res: Response, next: NextFunction) => {
-    res.status(404).end();
+    // check if the file exists
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File not found");
+    }
+
+    res.sendFile(filePath);
+    //add the file path "public/uploads" to the file path
 });
 
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+    res.status(404).send("Resource not found");
+});
 
 app.use(ErrorHandler.convert());
 app.use(ErrorHandler.handle());

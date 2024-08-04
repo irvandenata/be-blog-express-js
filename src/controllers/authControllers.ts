@@ -1,7 +1,8 @@
-import { NextFunction, RequestHandler } from "express";
+import { NextFunction, RequestHandler, response } from "express";
 import catchAsync from "../utils/catchAsync";
 import AuthService from "../services/authService";
 import { CLIENT_URL } from "../config";
+import { responseFormatter } from "../utils/helpers";
 
 const authService = new AuthService();
 
@@ -15,7 +16,7 @@ export const register: RequestHandler = catchAsync(async (req, res, next) => {
         password,
         passwordConfirm
     );
-    res.status(201).send({ status: "success", data });
+    res.status(201).send(responseFormatter("success", data, "single"));
 });
 
 export const verify: RequestHandler = catchAsync(async (req, res, next) => {
@@ -48,7 +49,7 @@ export const checkAuth: RequestHandler = catchAsync(async (req, res, next) => {
     const data = await authService.checkUserSession(
         req.cookies[process.env.COOKIE_NAME as string]
     );
-    return res.status(200).send({ status: "success", data });
+    return res.status(200).send(responseFormatter("success", data, "single"));
 });
 
 export const logout: RequestHandler = (req, res, next) => {

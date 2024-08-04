@@ -15,6 +15,8 @@ module.exports = {
          * }], {});
         */
 
+        // drop all data
+        await queryInterface.bulkDelete('users',null,{});
         await queryInterface.bulkInsert('users',[
             {
                 id: 'f7b3b2b1-5b7b-4b3b-8b3b-7b3b2b1b3b2a',
