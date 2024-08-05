@@ -32,8 +32,8 @@ To get a local copy of the project up and running, follow these simple steps.
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/your-username/blog-rest-api.git
-    cd blog-rest-api
+    https://github.com/irvandenata/be-blog-express-ts.git
+    cd be-blog-express-ts
     ```
 
 2. Install the dependencies:
