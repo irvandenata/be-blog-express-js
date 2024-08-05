@@ -139,7 +139,6 @@ const User = db.define<UserModel>(
                 user.dataValues = newValues;
             },
             afterUpdate: (user: any, options) => {
-                console.log("after update");
                 const newValues: object = {};
                 Object.keys(user.dataValues).forEach((key) => {
                     newValues[camelCase(key)] = user.dataValues[key];
@@ -170,7 +169,7 @@ const User = db.define<UserModel>(
             beforeDestroy: async (user: UserModel, options) => {
                 console.log("before destroy");
                 if (user?.profileImage) {
-                    const oldPath = `public/uploads/${user.profileImage}`;
+                    const oldPath = `${process.env.STORAGE_PATH}/${user.profileImage}`;
                     const fs = require("fs");
                     fs.unlink(oldPath, (err: any) => {
                         if (err) {

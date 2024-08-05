@@ -28,7 +28,7 @@ app.all("/storages/*", (req: Request, res: Response, next: NextFunction) => {
     const filePath: string = path.join(
         __dirname,
         "../",
-        req.url.replace("/storages", "/public/uploads")
+        req.url.replace("/storages", process.env.STORAGE_PATH as string)
     );
 
     // check if the file exists
@@ -37,7 +37,6 @@ app.all("/storages/*", (req: Request, res: Response, next: NextFunction) => {
     }
 
     res.sendFile(filePath);
-    //add the file path "public/uploads" to the file path
 });
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

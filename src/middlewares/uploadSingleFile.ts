@@ -8,13 +8,22 @@ import fs from "fs";
 // configure disk storage option
 const storeOnDisk = (path?: string) => {
     // create folder if not exist
-    const dir = path ? `public/uploads/images/${path}` : "public/uploads/images/";
+
+    const dir = path
+        ? `./${process.env.STORAGE_PATH}/images/${path}`
+        : `./${process.env.STORAGE_PATH}/images/`;
+
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
     return multer.diskStorage({
         destination: (req: Request, file: File, cb: Function) => {
-            cb(null, path ? `public/uploads/images/${path}` : "public/uploads/images/");
+            cb(
+                null,
+                path
+                    ? `${process.env.STORAGE_PATH}/images/${path}`
+                    : `${process.env.STORAGE_PATH}/images/`
+            );
         },
         filename: (req: Request, file: File, cb: Function) => {
             const ext = file.mimetype.split("/")[1];

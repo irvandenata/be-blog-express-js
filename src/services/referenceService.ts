@@ -63,7 +63,7 @@ export default class ReferenceService {
     ) => {
         let image: string = "";
         if (file) {
-            image = file.path!.replace("public/uploads/", "");
+            image = file.path!.replace(`${process.env.STORAGE_PATH}/`, "");
         }
         return await ArticleCategory.create(
             { ...data, image: image },
@@ -92,7 +92,7 @@ export default class ReferenceService {
     ) => {
         let image: string = "";
         if (file) {
-            image = file.path!.replace("public/uploads/", "");
+            image = file.path!.replace(`${process.env.STORAGE_PATH}/`, "");
         }
         return await ArticleCategory.update(
             { ...data, image: image },

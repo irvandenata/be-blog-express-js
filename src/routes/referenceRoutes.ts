@@ -9,6 +9,8 @@ import {
 import authorizeOnly from "../middlewares/athorizeOnly";
 import uploadSingleFile from "../middlewares/uploadSingleFile";
 import resizeSignleImage from "../middlewares/resizeSingleImage";
+import checkExistFindData from "../middlewares/checkExistFindData";
+import ArticleCategory from "../models/articleCategory";
 const router = Router();
 
 router
@@ -16,19 +18,21 @@ router
     .post(
         "/article-categories",
         authorizeOnly("Admin"),
-        uploadSingleFile("image", "disk", "article-cateogry"),
+        uploadSingleFile("image", "disk", "article-category"),
         resizeSignleImage(0, 0, 100),
         createArticleCategory
     )
     .get(
         "/article-categories/:slug",
+        checkExistFindData(ArticleCategory, "slug"),
         authorizeOnly("Admin"),
         getArticleCategoryBySlug
     )
     .patch(
         "/article-categories/:slug",
         authorizeOnly("Admin"),
-        uploadSingleFile("image", "disk", "article-cateogry"),
+        checkExistFindData(ArticleCategory, "slug"),
+        uploadSingleFile("image", "disk", "article-category"),
         resizeSignleImage(0, 0, 100),
         updateArticleCategoryBySlug
     )

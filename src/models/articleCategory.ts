@@ -59,7 +59,7 @@ ArticleCategory.beforeUpdate(async (articleCategory) => {
     // check slug not used
 
     if (articleCategory.previous("image") !== articleCategory.image) {
-        let oldImage = "public/uploads/" + articleCategory.previous("image");
+        let oldImage = `${process.env.STORAGE_PATH}/` + articleCategory.previous("image");
         deleteFileIfExists(oldImage);
     }
     let slug: string = articleCategory.name.split(" ").join("-");
@@ -104,7 +104,7 @@ ArticleCategory.afterFind((results, options) => {
 
 ArticleCategory.afterDestroy(async (articleCategory) => {
     if (articleCategory.previous("image")) {
-        let oldImage = "public/uploads/" + articleCategory.previous("image");
+        let oldImage = `${process.env.STORAGE_PATH}/` + articleCategory.previous("image");
         deleteFileIfExists(oldImage);
     }
 });

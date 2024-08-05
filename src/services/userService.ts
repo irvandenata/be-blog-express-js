@@ -103,7 +103,7 @@ export default class UserService {
         const hostName = protocol + "://" + host;
         let profileImage: string = "";
         if (file) {
-            profileImage = file.path!.replace("public/uploads/", "");
+            profileImage = file.path!.replace(`${process.env.STORAGE_PATH}/`, "");
         }
 
         const result: UserModel = await User.create(
@@ -182,9 +182,9 @@ export default class UserService {
 
         let profileImage = "";
         if (file) {
-            profileImage = file.path!.replace("public/uploads/", "");
+            profileImage = file.path!.replace(`${process.env.STORAGE_PATH}/`, "");
             if (currentUser?.profileImage) {
-                const oldPath = `public/uploads/${currentUser.profileImage}`;
+                const oldPath = `${process.env.STORAGE_PATH}/${currentUser.profileImage}`;
                 this.deleteFileIfExists(oldPath);
             }
         }
@@ -231,7 +231,7 @@ export default class UserService {
             console.log(user);
 
             if (user!.profileImage) {
-                const oldPath = `public/uploads/${user.previous(
+                const oldPath = `${process.env.STORAGE_PATH}/${user.previous(
                     "profileImage"
                 )}`;
                 await this.deleteFileIfExists(oldPath);
