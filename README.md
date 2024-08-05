@@ -68,12 +68,12 @@ To start the development server:
 npm run dev
 # or
 yarn dev
-
+```
 # Project Structure
 
 The project structure is organized as follows:
 
-
+```
 ├── src
 │ ├── config
 │ ├── controllers
@@ -91,7 +91,7 @@ The project structure is organized as follows:
 ├── package.json
 ├── tsconfig.json
 └── README.md
-
+```
 
 - **config**: Configuration files, including database configuration.
 - **controllers**: Functions to handle the HTTP requests.
