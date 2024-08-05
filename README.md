@@ -74,20 +74,30 @@ yarn dev
 The project structure is organized as follows:
 
 ```
+├──logs
+├──migrations
+├──seeders
+├──public
 ├── src
 │ ├── config
 │ ├── controllers
+│ ├── interfaces
 │ ├── middlewares
 │ ├── models
 │ ├── routes
 │ ├── services
+│ ├── types
 │ ├── utils
 │ ├── validators
+│ ├── api.ts
+│ ├── app.ts
 │ └── index.ts
 ├── tests
 ├── .env
+├── babel.config.json
+├── nodemon.json
 ├── .gitignore
-├── jest.config.js
+├── jest.setup.js
 ├── package.json
 ├── tsconfig.json
 └── README.md
