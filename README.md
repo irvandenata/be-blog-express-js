@@ -80,6 +80,7 @@ To get a local copy of the project up and running, follow these simple steps.
 
     ```sh
     npx sequelize-cli db:migrate
+    npx sequelize-cli db:seed:all
     ```
 
 ## Running the Project
