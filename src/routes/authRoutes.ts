@@ -16,6 +16,6 @@ router
     .get("/verify/:token", verify)
     .post("/login", login)
     .get("/check-auth", checkAuth)
-    .get("/logout", logout);
+    .get("/logout", logout)
 
 export default router;

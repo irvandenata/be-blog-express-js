@@ -1,11 +1,19 @@
 import { Op } from "sequelize";
 import AppError from "../utils/appError";
-import { ReferenceFilter, File, ArticleCategoryModel } from "../interfaces";
+import {
+    ReferenceFilter,
+    File,
+    ArticleCategoryModel,
+    ArticleTagModel,
+} from "../interfaces";
 import ArticleCategory from "../models/articleCategory";
 import fs from "fs";
 import { generateUrlImage } from "../utils/helpers";
+import ArticleTag from "../models/articleTag";
 export default class ReferenceService {
     constructor() {}
+
+    // Start Article Category
 
     /**
      * @function getArticleCategories
@@ -109,8 +117,6 @@ export default class ReferenceService {
         });
     };
 
-
-
     public deleteArticleCategory = async (slug: string) => {
         const result = await ArticleCategory.destroy({
             where: { slug },
@@ -121,6 +127,112 @@ export default class ReferenceService {
         }
         return { message: "Article category deleted successfully" };
     };
+
+    // End Article Category
+
+    // Start Article Tag
+
+    /**
+     * @function getArticleTags
+     * @summary Retrieves a list of article tags
+     * @param {ReferenceFilter} query - The query parameters for filtering the article tags
+     * @return {ArticleTag[]} - An array of article category objects
+     */
+    public getArticleTags: Function = async (query: ReferenceFilter) => {
+        const { limit, offset } = this.paginate(query.page, query.limit);
+        const sk = query.q ? query.q : "";
+        const result = await ArticleTag.findAll({
+            where: {
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.iLike]: `%${sk}%`,
+                        },
+                    },
+                ],
+            },
+            limit,
+            offset,
+        });
+        const totalData = await ArticleTag.count({
+            where: {
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.iLike]: `%${sk}%`,
+                        },
+                    },
+                ],
+            },
+        });
+
+        return {
+            rows: result,
+            page: offset / limit + 1,
+            limit: limit,
+            count: totalData,
+            totalData: totalData,
+            totalPages: Math.ceil(totalData / (query.limit || 10)),
+        };
+    };
+
+    /**
+     * @function createArticleTag
+     * @summary Creates a new article category
+     * @param {ArticleTagData} data - The data for creating a new article category
+     * @return {ArticleTag} - The newly created article category object
+     */
+    public createArticleTag: Function = async (data: ArticleTagModel) => {
+        return await ArticleTag.create(
+            { ...data },
+            {
+                returning: true,
+            }
+        );
+    };
+
+    public getArticleTagBySlug: Function = async (slug: string) => {
+        return await ArticleTag.findOne({
+            where: { slug },
+        }).then((result) => {
+            if (!result) {
+                throw new AppError(404, "Article tag not found");
+            }
+            return result;
+        });
+    };
+
+    public updateArticleTagBySlug: Function = async (
+        data: ArticleTagModel,
+        slug: string
+    ) => {
+        return await ArticleTag.update(
+            { ...data },
+            {
+                where: { slug },
+                returning: true,
+                individualHooks: true,
+            }
+        ).then(([rows, [result]]) => {
+            if (!result) {
+                throw new AppError(404, "Article tag not found");
+            }
+            return result;
+        });
+    };
+
+    public deleteArticleTag = async (slug: string) => {
+        const result = await ArticleTag.destroy({
+            where: { slug },
+            individualHooks: true,
+        });
+        if (!result) {
+            throw new AppError(404, "Article tag not found");
+        }
+        return { message: "Article tag deleted successfully" };
+    };
+
+    // End Article Tag
 
     // public getBlogs: Function = async (query: BlogFilter) => {
     //     const { limit, offset } = this.paginate(query.page, query.limit);

@@ -4,7 +4,7 @@ import db from "./connection";
 import { deleteFileIfExists, generateUrlImage } from "../utils/helpers";
 
 const ArticleTag = db.define<ArticleTagModel>(
-    "articleCategory",
+    "articleTag",
     {
         id: {
             type: DataTypes.INTEGER,
@@ -23,10 +23,6 @@ const ArticleTag = db.define<ArticleTagModel>(
                 },
             },
         },
-        image: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         slug: {
             type: DataTypes.STRING,
             allowNull: true,
@@ -37,11 +33,11 @@ const ArticleTag = db.define<ArticleTagModel>(
     }
 );
 
-ArticleTag.beforeCreate(async (articleCategory) => {
+ArticleTag.beforeCreate(async (articleTag) => {
     // check slug not used
 
-    let slug: string = articleCategory.name.split(" ").join("-");
-    await db.models.articleCategory
+    let slug: string = articleTag.name.split(" ").join("-");
+    await db.models.articleTag
         .findOne({
             where: {
                 slug: slug,
@@ -52,22 +48,17 @@ ArticleTag.beforeCreate(async (articleCategory) => {
                 slug = slug + "-" + Math.floor(Math.random() * 1000);
             }
         });
-    articleCategory.slug = slug;
+    articleTag.slug = slug;
 });
 
-ArticleTag.beforeUpdate(async (articleCategory) => {
+ArticleTag.beforeUpdate(async (articleTag) => {
     // check slug not used
-
-    if (articleCategory.previous("image") !== articleCategory.image) {
-        let oldImage = `${process.env.STORAGE_PATH}/` + articleCategory.previous("image");
-        deleteFileIfExists(oldImage);
-    }
-    let slug: string = articleCategory.name.split(" ").join("-");
-    await db.models.articleCategory
+    let slug: string = articleTag.name.split(" ").join("-");
+    await db.models.articleTag
         .findOne({
             where: {
                 slug: slug,
-                id: { [Op.ne]: articleCategory.id },
+                id: { [Op.ne]: articleTag.id },
             },
         })
         .then((result) => {
@@ -75,38 +66,7 @@ ArticleTag.beforeUpdate(async (articleCategory) => {
                 slug = slug + "-" + Math.floor(Math.random() * 1000);
             }
         });
-    articleCategory.slug = slug;
-});
-
-ArticleTag.afterUpdate(async (articleCategory) => {
-    articleCategory.image = articleCategory.image
-        ? generateUrlImage(articleCategory.image)
-        : "";
-});
-
-ArticleTag.afterCreate(async (articleCategory) => {
-    articleCategory.image = articleCategory.image
-        ? generateUrlImage(articleCategory.image)
-        : "";
-});
-
-ArticleTag.afterFind((results, options) => {
-    if (Array.isArray(results)) {
-        results.forEach((result) => {
-            (result as ArticleTagModel).image = (
-                result as ArticleTagModel
-            )?.image
-                ? generateUrlImage((result as ArticleTagModel).image)
-                : "";
-        });
-    }
-});
-
-ArticleTag.afterDestroy(async (articleCategory) => {
-    if (articleCategory.previous("image")) {
-        let oldImage = `${process.env.STORAGE_PATH}/` + articleCategory.previous("image");
-        deleteFileIfExists(oldImage);
-    }
+    articleTag.slug = slug;
 });
 
 export default ArticleTag;

@@ -1,19 +1,10 @@
 import { InferAttributes, InferCreationAttributes, Model } from "sequelize";
 
+// Start Article Category
 export interface ArticleCategoryData {
     name: string;
     slug: string;
 }
-
-
-
-// ReferenceFilter
-export interface ReferenceFilter {
-    page?: number;
-    limit?: number;
-    q?: string;
-}
-
 
 export interface ArticleCategoryModel
     extends Model<
@@ -24,6 +15,38 @@ export interface ArticleCategoryModel
     name: string;
     slug: string;
     image?: string;
+}
+
+// End Article Category
+
+// Start Article Tag
+
+
+export interface ArticleTagData {
+    name: string;
+    slug: string;
+}
+
+export interface ArticleTagModel
+    extends Model<
+        InferAttributes<ArticleCategoryModel>,
+        InferCreationAttributes<ArticleCategoryModel>
+    > {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+// End Article Tag
+
+
+
+
+// ReferenceFilter
+export interface ReferenceFilter {
+    page?: number;
+    limit?: number;
+    q?: string;
 }
 
 // other interfaces
@@ -85,7 +108,6 @@ export interface PasswordData {
     passwordConfirm: string;
 }
 
-
 export interface BlogModel
     extends Model<
         InferAttributes<BlogModel>,
@@ -104,7 +126,6 @@ export interface BlogModel
     authorId?: string;
     categoryId?: number;
 }
-
 
 export interface BlogFilter {
     page?: number;
