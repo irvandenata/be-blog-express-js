@@ -49,9 +49,31 @@ To get a local copy of the project up and running, follow these simple steps.
     Create a `.env` file in the root of the project and add the following variables:
 
     ```env
+    NODE_ENV=  # production | development | test
+    API_URL_TEST=      #"http://localhost:4000"
+    CLIENT_URL_TEST=   #"http://localhost:3000"
     PORT=3000
-    DATABASE_URL=your_postgresql_database_url
-    JWT_SECRET=your_jwt_secret
+
+    DB_HOST=localhost
+    DB_USER=postgres
+    DB_PASSWORD=postgres
+    DB_NAME=databasename
+    DB_PORT=5432
+
+    PASSWORD_HASH_CYCLE=10
+    CLIENT_URL_DEV="http://localhost"
+    COOKIE_NAME=blogqid
+    COOKIE_NAME_REFRESH=blogqidrefresh       
+    JWT_SESSION_EXPIRY=60m
+    JWT_SESSION_SECRET=sessionsecret
+    JWT_REFRESH_SECRET=refreshsecret
+    JWT_REFRESH_EXPIRY=7d
+    JWT_VERIFY_SECRET=verifysecret
+    JWT_VERIFY_EXPIRY=1d
+    API_VERSION=v1
+    GMAIL_APP_USER=   #"mail@gmail.com"
+    GMAIL_APP_PASSWORD=  #password
+    STORAGE_PATH="/public/uploads"
     ```
 
 4. Run database migrations:
